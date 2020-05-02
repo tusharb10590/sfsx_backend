@@ -1,7 +1,10 @@
-function Order(quantity,price, side,timeStamp){
+function Order(quantity,price, side,timeStamp,executionPrice,name){
     this.quantity = quantity;
     this.side = side
     this.price =  price
+    this.timeStamp = timeStamp
+    this.executionPrice = executionPrice
+    this.traderName = name
 
     this.getSide = () => { return this.type }
     this.getPrice = () => { return this.price }

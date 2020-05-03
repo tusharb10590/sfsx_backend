@@ -11,7 +11,7 @@ const GLOBAL_TICKER_DATA = [
     {id:3,label:"Oracle", ticker:"ORCL"},
     {id:4,label:"Zeguro", ticker:"ZGRO"},
 ]
-let order = new Order(300,100,'b',(new Date()).getTime())
+// let order = new Order(300,100,'b',(new Date()).getTime())
 var BUY_BOOK = {
     1:[],
     2:[],
@@ -33,6 +33,7 @@ var ACTIVITY_LOG = []
 
 
 routes.get('/ticker',(req,res)=>{
+    console.log('[GET] /ticker API')
     res.json(GLOBAL_TICKER_DATA)
 })
 
@@ -40,12 +41,13 @@ routes.post('/order', (req,res)=>{
     try{
         console.log(req.body)
         let ticker = req.body.ticker
-        
+        let tickerLabel = getTickerLabel(ticker)
         if(ticker && ORDER_ID.includes(ticker)){
             let order = req.body.order;
             // DETAIL Validation required
             if(order && order.qty && order.price && order.side ){
-                let newOrder = new Order(order.qty, order.price, order.side,(new Date()).getTime(),0,order.name); 
+                
+                let newOrder = new Order(order.qty, order.price, order.side,(new Date()).getTime(),0,order.name,tickerLabel); 
                 let status = executeOrder(newOrder,ticker)
                 if(!status){
                     if(order.side == 'b'){
@@ -101,9 +103,11 @@ routes.get('/logs', (req,res)=>{
 })
 
 routes.get('/order/:id', (req,res)=>{
+    let tickerId = req.params.id
+    console.log(tickerId)
     res.json({
-        'buy_book':BUY_BOOK[1],
-        'sell_book':SELL_BOOK[1]
+        'buy_book':BUY_BOOK[tickerId],
+        'sell_book':SELL_BOOK[tickerId]
         
     })
 })
@@ -210,6 +214,16 @@ function executeOrder(newOrder,ticker){
 
     return executeStatus;
 
+}
+
+function getTickerLabel(tickerId){
+    let label = ''
+    GLOBAL_TICKER_DATA.forEach(ticker=>{
+        if(ticker.id == tickerId){
+            label = ticker.ticker
+        }
+    })
+    return label
 }
 
 module.exports = routes
